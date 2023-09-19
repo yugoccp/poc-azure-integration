@@ -1,0 +1,45 @@
+name: Trigger auto deployment for aca-github-integration
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '//**'
+    - '.github/workflows/aca-github-integration-AutoDeployTrigger-747982d1-d3a1-47a5-b5cd-2ac3cee82cb6.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.ACAGITHUBINTEGRATION_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.ACAGITHUBINTEGRATION_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.ACAGITHUBINTEGRATION_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: supplybrain.azurecr.io
+          registryUsername: ${{ secrets.ACAGITHUBINTEGRATION_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.ACAGITHUBINTEGRATION_REGISTRY_PASSWORD }}
+          containerAppName: aca-github-integration
+          resourceGroup: SupplyBrain
+          imageToBuild: supplybrain.azurecr.io/aca-github-integration:${{ github.sha }}
+          dockerfilePath: Dockerfile
+
+
