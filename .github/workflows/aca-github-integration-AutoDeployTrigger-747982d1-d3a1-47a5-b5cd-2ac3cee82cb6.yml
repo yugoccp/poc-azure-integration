@@ -7,7 +7,7 @@ on:
     branches: 
       [ main ]
     paths:
-    - '//**'
+    - '**'
     - '.github/workflows/aca-github-integration-AutoDeployTrigger-747982d1-d3a1-47a5-b5cd-2ac3cee82cb6.yml'
 
   # Allow manual trigger 
