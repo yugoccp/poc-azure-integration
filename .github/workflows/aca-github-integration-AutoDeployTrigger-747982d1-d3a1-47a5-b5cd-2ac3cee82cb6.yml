@@ -17,7 +17,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions: 
-      id-token: write #This is required for requesting the OIDC JWT Token
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout to the branch
